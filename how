@@ -1,0 +1,1202 @@
+[33mcommit c432c8fa1be0f594efbfe26bca57c965bd2899bb[m
+Author: lillieg <llglasgo@gmail.com>
+Date:   Mon Feb 22 23:37:40 2016 +0000
+
+    Associated pins with users and added Authentication for users
+
+[1mdiff --git a/Gemfile b/Gemfile[m
+[1mindex db48b77..3c77dfb 100644[m
+[1m--- a/Gemfile[m
+[1m+++ b/Gemfile[m
+[36m@@ -1,47 +1,24 @@[m
+ source 'https://rubygems.org'[m
+ [m
+[31m-[m
+[31m-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'[m
+ gem 'rails', '4.2.5'[m
+[31m-# Use sqlite3 as the database for Active Record[m
+[31m-gem 'sqlite3'[m
+[31m-# Use SCSS for stylesheets[m
+ gem 'sass-rails', '~> 5.0'[m
+[31m-# Use Uglifier as compressor for JavaScript assets[m
+ gem 'uglifier', '>= 1.3.0'[m
+[31m-# Use CoffeeScript for .coffee assets and views[m
+ gem 'coffee-rails', '~> 4.1.0'[m
+[31m-# See https://github.com/rails/execjs#readme for more supported runtimes[m
+[31m-# gem 'therubyracer', platforms: :ruby[m
+[31m-[m
+[31m-# Use jquery as the JavaScript library[m
+ gem 'jquery-rails'[m
+[31m-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks[m
+ gem 'turbolinks'[m
+[31m-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder[m
+ gem 'jbuilder', '~> 2.0'[m
+[31m-# bundle exec rake doc:rails generates the API under doc/api.[m
+ gem 'sdoc', '~> 0.4.0', group: :doc[m
+[31m-[m
+[31m-# Use ActiveModel has_secure_password[m
+[31m-# gem 'bcrypt', '~> 3.1.7'[m
+[31m-[m
+[31m-# Use Unicorn as the app server[m
+[31m-# gem 'unicorn'[m
+[31m-[m
+[31m-# Use Capistrano for deployment[m
+[31m-# gem 'capistrano-rails', group: :development[m
+[31m-[m
+[32m+[m[32mgem 'bootstrap-sass', '~> 3.3', '>= 3.3.6'[m
+[32m+[m[32mgem 'devise', '~> 3.5', '>= 3.5.6'[m
+[32m+[m[32mgem 'haml', '~> 4.0', '>= 4.0.7'[m
+[32m+[m[32mgem 'coffee-script-source', '~> 1.10'[m
+ group :development, :test do[m
+[31m-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console[m
+[31m-  gem 'byebug'[m
+[32m+[m[32m gem 'sqlite3'[m
+ end[m
+ [m
+[31m-group :development do[m
+[31m-  # Access an IRB console on exception pages or by using <%= console %> in views[m
+[31m-  gem 'web-console', '~> 2.0'[m
+[31m-[m
+[31m-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring[m
+[31m-  gem 'spring'[m
+[31m-end[m
+[32m+[m[32mgroup :production do[m
+[32m+[m[32m  gem 'pg', '0.17.1'[m[41m [m
+[32m+[m[32m  gem 'rails_12factor', '0.0.2'[m[41m [m
+[32m+[m[41m  [m
+[32m+[m[32m  end[m
+ [m
+[1mdiff --git a/Gemfile.lock b/Gemfile.lock[m
+[1mindex 2d22f22..ba1585b 100644[m
+[1m--- a/Gemfile.lock[m
+[1m+++ b/Gemfile.lock[m
+[36m@@ -37,10 +37,14 @@[m [mGEM[m
+       thread_safe (~> 0.3, >= 0.3.4)[m
+       tzinfo (~> 1.1)[m
+     arel (6.0.3)[m
+[31m-    binding_of_caller (0.7.2)[m
+[31m-      debug_inspector (>= 0.0.1)[m
+[32m+[m[32m    autoprefixer-rails (6.3.3)[m
+[32m+[m[32m      execjs[m
+[32m+[m[32m      json[m
+[32m+[m[32m    bcrypt (3.1.10)[m
+[32m+[m[32m    bootstrap-sass (3.3.6)[m
+[32m+[m[32m      autoprefixer-rails (>= 5.2.1)[m
+[32m+[m[32m      sass (>= 3.3.4)[m
+     builder (3.2.2)[m
+[31m-    byebug (8.2.1)[m
+     coffee-rails (4.1.1)[m
+       coffee-script (>= 2.2.0)[m
+       railties (>= 4.0.0, < 5.1.x)[m
+[36m@@ -49,11 +53,19 @@[m [mGEM[m
+       execjs[m
+     coffee-script-source (1.10.0)[m
+     concurrent-ruby (1.0.0)[m
+[31m-    debug_inspector (0.0.2)[m
+[32m+[m[32m    devise (3.5.6)[m
+[32m+[m[32m      bcrypt (~> 3.0)[m
+[32m+[m[32m      orm_adapter (~> 0.1)[m
+[32m+[m[32m      railties (>= 3.2.6, < 5)[m
+[32m+[m[32m      responders[m
+[32m+[m[32m      thread_safe (~> 0.1)[m
+[32m+[m[32m      warden (~> 1.2.3)[m
+     erubis (2.7.0)[m
+     execjs (2.6.0)[m
+     globalid (0.3.6)[m
+       activesupport (>= 4.1.0)[m
+[32m+[m[32m    haml (4.0.7)[m
+[32m+[m[32m      tilt[m
+     i18n (0.7.0)[m
+     jbuilder (2.4.0)[m
+       activesupport (>= 3.0.0, < 5.1)[m
+[36m@@ -73,6 +85,8 @@[m [mGEM[m
+     multi_json (1.11.2)[m
+     nokogiri (1.6.7.2)[m
+       mini_portile2 (~> 2.0.0.rc2)[m
+[32m+[m[32m    orm_adapter (0.5.0)[m
+[32m+[m[32m    pg (0.17.1)[m
+     rack (1.6.4)[m
+     rack-test (0.6.3)[m
+       rack (>= 1.0)[m
+[36m@@ -95,6 +109,11 @@[m [mGEM[m
+       rails-deprecated_sanitizer (>= 1.0.1)[m
+     rails-html-sanitizer (1.0.2)[m
+       loofah (~> 2.0)[m
+[32m+[m[32m    rails_12factor (0.0.2)[m
+[32m+[m[32m      rails_serve_static_assets[m
+[32m+[m[32m      rails_stdout_logging[m
+[32m+[m[32m    rails_serve_static_assets (0.0.5)[m
+[32m+[m[32m    rails_stdout_logging (0.0.4)[m
+     railties (4.2.5)[m
+       actionpack (= 4.2.5)[m
+       activesupport (= 4.2.5)[m
+[36m@@ -102,6 +121,8 @@[m [mGEM[m
+       thor (>= 0.18.1, < 2.0)[m
+     rake (10.5.0)[m
+     rdoc (4.2.1)[m
+[32m+[m[32m    responders (2.1.1)[m
+[32m+[m[32m      railties (>= 4.2.0, < 5.1)[m
+     sass (3.4.21)[m
+     sass-rails (5.0.4)[m
+       railties (>= 4.0.0, < 5.0)[m
+[36m@@ -112,7 +133,6 @@[m [mGEM[m
+     sdoc (0.4.1)[m
+       json (~> 1.7, >= 1.7.7)[m
+       rdoc (~> 4.0)[m
+[31m-    spring (1.6.2)[m
+     sprockets (3.5.2)[m
+       concurrent-ruby (~> 1.0)[m
+       rack (> 1, < 3)[m
+[36m@@ -131,28 +151,28 @@[m [mGEM[m
+     uglifier (2.7.2)[m
+       execjs (>= 0.3.0)[m
+       json (>= 1.8.0)[m
+[31m-    web-console (2.2.1)[m
+[31m-      activemodel (>= 4.0)[m
+[31m-      binding_of_caller (>= 0.7.2)[m
+[31m-      railties (>= 4.0)[m
+[31m-      sprockets-rails (>= 2.0, < 4.0)[m
+[32m+[m[32m    warden (1.2.6)[m
+[32m+[m[32m      rack (>= 1.0)[m
+ [m
+ PLATFORMS[m
+   ruby[m
+ [m
+ DEPENDENCIES[m
+[31m-  byebug[m
+[32m+[m[32m  bootstrap-sass (~> 3.3, >= 3.3.6)[m
+   coffee-rails (~> 4.1.0)[m
+[32m+[m[32m  coffee-script-source (~> 1.10)[m
+[32m+[m[32m  devise (~> 3.5, >= 3.5.6)[m
+[32m+[m[32m  haml (~> 4.0, >= 4.0.7)[m
+   jbuilder (~> 2.0)[m
+   jquery-rails[m
+[32m+[m[32m  pg (= 0.17.1)[m
+   rails (= 4.2.5)[m
+[32m+[m[32m  rails_12factor (= 0.0.2)[m
+   sass-rails (~> 5.0)[m
+   sdoc (~> 0.4.0)[m
+[31m-  spring[m
+   sqlite3[m
+   turbolinks[m
+   uglifier (>= 1.3.0)[m
+[31m-  web-console (~> 2.0)[m
+ [m
+ BUNDLED WITH[m
+    1.11.2[m
+[1mdiff --git a/app/assets/javascripts/application.js b/app/assets/javascripts/application.js[m
+[1mindex e07c5a8..54cc198 100644[m
+[1m--- a/app/assets/javascripts/application.js[m
+[1m+++ b/app/assets/javascripts/application.js[m
+[36m@@ -13,4 +13,5 @@[m
+ //= require jquery[m
+ //= require jquery_ujs[m
+ //= require turbolinks[m
+[31m-//= require_tree .[m
+[32m+[m[32m//= require bootstrap-sprockets[m
+[41m+[m
+[1mdiff --git a/app/assets/javascripts/pins.coffee b/app/assets/javascripts/pins.coffee[m
+[1mnew file mode 100644[m
+[1mindex 0000000..24f83d1[m
+[1m--- /dev/null[m
+[1m+++ b/app/assets/javascripts/pins.coffee[m
+[36m@@ -0,0 +1,3 @@[m
+[32m+[m[32m# Place all the behaviors and hooks related to the matching controller here.[m
+[32m+[m[32m# All this logic will automatically be available in application.js.[m
+[32m+[m[32m# You can use CoffeeScript in this file: http://coffeescript.org/[m
+[1mdiff --git a/app/assets/javascripts/pinsclears.coffee b/app/assets/javascripts/pinsclears.coffee[m
+[1mnew file mode 100644[m
+[1mindex 0000000..24f83d1[m
+[1m--- /dev/null[m
+[1m+++ b/app/assets/javascripts/pinsclears.coffee[m
+[36m@@ -0,0 +1,3 @@[m
+[32m+[m[32m# Place all the behaviors and hooks related to the matching controller here.[m
+[32m+[m[32m# All this logic will automatically be available in application.js.[m
+[32m+[m[32m# You can use CoffeeScript in this file: http://coffeescript.org/[m
+[1mdiff --git a/app/assets/stylesheets/bootstraply.css.scss b/app/assets/stylesheets/bootstraply.css.scss[m
+[1mnew file mode 100644[m
+[1mindex 0000000..474a8b9[m
+[1m--- /dev/null[m
+[1m+++ b/app/assets/stylesheets/bootstraply.css.scss[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m
+[32m+[m[32mjumbotron-bg:class="btn btn-danger;[m
+[32m+[m[32m@import 'bootstrap-responsive'; -->[m
+[32m+[m[32m@import "bootstrap-sprockets";[m
+[32m+[m[32m@import "bootstrap";[m
+[1mdiff --git a/app/assets/stylesheets/pins.scss b/app/assets/stylesheets/pins.scss[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0f850ab[m
+[1m--- /dev/null[m
+[1m+++ b/app/assets/stylesheets/pins.scss[m
+[36m@@ -0,0 +1,3 @@[m
+[32m+[m[32m// Place all the styles related to the pins controller here.[m
+[32m+[m[32m// They will automatically be included in application.css.[m
+[32m+[m[32m// You can use Sass (SCSS) here: http://sass-lang.com/[m
+[1mdiff --git a/app/assets/stylesheets/pinsclears.scss b/app/assets/stylesheets/pinsclears.scss[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a0cab03[m
+[1m--- /dev/null[m
+[1m+++ b/app/assets/stylesheets/pinsclears.scss[m
+[36m@@ -0,0 +1,3 @@[m
+[32m+[m[32m// Place all the styles related to the pinsclears controller here.[m
+[32m+[m[32m// They will automatically be included in application.css.[m
+[32m+[m[32m// You can use Sass (SCSS) here: http://sass-lang.com/[m
+[1mdiff --git a/app/assets/stylesheets/scaffolds.scss b/app/assets/stylesheets/scaffolds.scss[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ed7a765[m
+[1m--- /dev/null[m
+[1m+++ b/app/assets/stylesheets/scaffolds.scss[m
+[36m@@ -0,0 +1,73 @@[m
+[32m+[m[32mbody {[m
+[32m+[m[32m  background-color: #fff;[m
+[32m+[m[32m  color: #333;[m
+[32m+[m[32m  font-family: verdana, arial, helvetica, sans-serif;[m
+[32m+[m[32m  font-size: 13px;[m
+[32m+[m[32m  line-height: 18px;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mp, ol, ul, td {[m
+[32m+[m[32m  font-family: verdana, arial, helvetica, sans-serif;[m
+[32m+[m[32m  font-size: 13px;[m
+[32m+[m[32m  line-height: 18px;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mpre {[m
+[32m+[m[32m  background-color: #eee;[m
+[32m+[m[32m  padding: 10px;[m
+[32m+[m[32m  font-size: 11px;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32ma {[m
+[32m+[m[32m  color: #000;[m
+[32m+[m
+[32m+[m[32m  &:visited {[m
+[32m+[m[32m    color: #666;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  &:hover {[m
+[32m+[m[32m    color: #fff;[m
+[32m+[m[32m    background-color: #000;[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mdiv {[m
+[32m+[m[32m  &.field, &.actions {[m
+[32m+[m[32m    margin-bottom: 10px;[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m#notice {[m
+[32m+[m[32m  color: green;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.field_with_errors {[m
+[32m+[m[32m  padding: 2px;[m
+[32m+[m[32m  background-color: red;[m
+[32m+[m[32m  display: table;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m#error_explanation {[m
+[32m+[m[32m  width: 450px;[m
+[32m+[m[32m  border: 2px solid red;[m
+[32m+[m[32m  padding: 7px;[m
+[32m+[m[32m  padding-bottom: 0;[m
+[32m+[m[32m  margin-bottom: 20px;[m
+[32m+[m[32m  background-color: #f0f0f0;[m
+[32m+[m
+[32m+[m[32m  h2 {[m
+[32m+[m[32m    text-align: left;[m
+[32m+[m[32m    font-weight: bold;[m
+[32m+[m[32m    padding: 5px 5px 5px 15px;[m
+[32m+[m[32m    font-size: 12px;[m
+[32m+[m[32m    margin: -7px;[m
+[32m+[m[32m    margin-bottom: 0px;[m
+[32m+[m[32m    background-color: #c00;[m
+[32m+[m[32m    color: #fff;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  ul li {[m
+[32m+[m[32m    font-size: 12px;[m
+[32m+[m[32m    list-style: square;[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[1mdiff --git a/app/controllers/pins_controller.rb b/app/controllers/pins_controller.rb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9d35705[m
+[1m--- /dev/null[m
+[1m+++ b/app/controllers/pins_controller.rb[m
+[36m@@ -0,0 +1,82 @@[m
+[32m+[m[32mclass PinsController < ApplicationController[m
+[32m+[m[32m  before_action :set_pin, only: [:show, :edit, :update, :destroy][m
+[32m+[m[32m  before_action :authenticate_user!, except: [:index, :show][m[41m [m
+[32m+[m[32m  before_action :correct_user, only: [:edit, :update, :destroy][m
+[32m+[m
+[32m+[m[32m  # GET /pins[m
+[32m+[m[32m  # GET /pins.json[m
+[32m+[m[32m  def index[m
+[32m+[m[32m    @pins = Pin.all[m
+[32m+[m[32m  end[m
+[32m+[m
+[32m+[m[32m  # GET /pins/1[m
+[32m+[m[32m  # GET /pins/1.json[m
+[32m+[m[32m  def show[m
+[32m+[m[32m  end[m
+[32m+[m
+[32m+[m[32m  # GET /pins/new[m
+[32m+[m[32m  def new[m
+[32m+[m[32m    @pin = current_user.pins.build[m
+[32m+[m[32m  end[m
+[32m+[m
+[32m+[m[32m  # GET /pins/1/edit[m
+[32m+[m[32m  def edit[m
+[32m+[m[32m  end[m
+[32m+[m
+[32m+[m[32m  # POST /pins[m
+[32m+[m[32m  # POST /pins.json[m
+[32m+[m[32m  def create[m
+[32m+[m[32m    @pin = current_user.pins.build(pin_params)[m
+[32m+[m
+[32m+[m[32m    respond_to do |format|[m
+[32m+[m[32m      if @pin.save[m
+[32m+[m[32m        format.html { redirect_to @pin, notice: 'Pin was successfully created.' }[m
+[32m+[m[32m        format.json { render :show, status: :created, location: @pin }[m
+[32m+[m[32m      else[m
+[32m+[m[32m        format.html { render :new }[m
+[32m+[m[32m        format.json { render json: @pin.errors, status: :unprocessable_entity }[m
+[32m+[m[32m      end[m
+[32m+[m[32m    end[m
+[32m+[m[32m  end[m
+[32m+[m
+[32m+[m[32m  # PATCH/PUT /pins/1[m
+[32m+[m[32m  # PATCH/PUT /pins/1.json[m
+[32m+[m[32m  def update[m
+[32m+[m[32m    respond_to do |format|[m
+[32m+[m[32m      if @pin.update(pin_params)[m
+[32m+[m[32m        format.html { redirect_to @pin, notice: 'Pin was successfully updated.' }[m
+[32m+[m[32m        format.json { render :show, status: :ok, location: @pin }[m
+[32m+[m[32m      else[m
+[32m+[m[32m        format.html { render :edit }[m
+[32m+[m[32m        format.json { render json: @pin.errors, status: :unprocessable_entity }[m
+[32m+[m[32m      end[m
+[32m+[m[32m    end[m
+[32m+[m[32m  end[m
+[32m+[m
+[32m+[m[32m  # DELETE /pins/1[m
+[32m+[m[32m  # DELETE /pins/1.json[m
+[32m+[m[32m  def destroy[m
+[32m+[m[32m    @pin.destroy[m
+[32m+[m[32m    respond_to do |format|[m
+[32m+[m[32m      format.html { redirect_to pins_url, notice: 'Pin was successfully destroyed.' }[m
+[32m+[m[32m      format.json { head :no_content }[m
+[32m+[m[32m    end[m
+[32m+[m[32m  end[m
+[32m+[m[41m  [m
+[32m+[m[32m  def correct_user[m
+[32m+[m[32m    @pin =current_user.pins.find_by(id:params[:id])[m
+[32m+[m[32m        redirect_to pins_path, notice: "Not authorized to edit this pin" if @pin.nil?[m
+[32m+[m[32m  end[m[41m [m
+[32m+[m[41m  [m
+[32m+[m[41m [m
+[32m+[m[32m  private[m
+[32m+[m[32m    # Use callbacks to share common setup or constraints between actions.[m
+[32m+[m[32m    def set_pin[m
+[32m+[m[32m      @pin = Pin.find(params[:id])[m
+[32m+[m[32m    end[m
+[32m+[m
+[32m+[m[32m    # Never trust parameters from the scary internet, only allow the white list through.[m
+[32m+[m[32m    def pin_params[m
+[32m+[m[32m      params.require(:pin).permit(:description)[m
+[32m+[m[32m    end[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/controllers/pinsclears_controller.rb b/app/controllers/pinsclears_controller.rb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4b5319d[m
+[1m--- /dev/null[m
+[1m+++ b/app/controllers/pinsclears_controller.rb[m
+[36m@@ -0,0 +1,58 @@[m
+[32m+[m[32mclass PinsController < ApplicationController[m
+[32m+[m	[32mbefore_action :find_pin, only: [:show, :edit, :update, :destroy, :upvote, :downvote][m
+[32m+[m	[32mbefore_action :authenticate_user!, except: [:index, :show][m
+[32m+[m
+[32m+[m	[32mdef index[m
+[32m+[m		[32m@pins = Pin.all.order("created_at DESC")[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m	[32mdef show[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m	[32mdef new[m
+[32m+[m		[32m@pin = current_user.pins.build[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m	[32mdef create[m
+[32m+[m		[32m@pin = current_user.pins.build(pin_params)[m
+[32m+[m
+[32m+[m		[32mif @pin.save[m
+[32m+[m			[32mredirect_to @pin, notice: "Pin was successfully created"[m
+[32m+[m		[32melse[m
+[32m+[m			[32mrender 'new'[m
+[32m+[m		[32mend[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m	[32mdef edit[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m	[32mdef update[m
+[32m+[m		[32mif @pin.update(pin_params)[m
+[32m+[m			[32mredirect_to @pin, notice: "Pin was successfully updated"[m
+[32m+[m		[32melse[m
+[32m+[m			[32mrender 'edit'[m
+[32m+[m		[32mend[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m[41m	[m
+[32m+[m[41m	[m
+[32m+[m[32mdef update[m
+[32m+[m		[32mif @pin.destroy(pin_params)[m
+[32m+[m			[32mredirect_to @pin, notice: "Pin was successfully deleted"[m
+[32m+[m		[32melse[m
+[32m+[m			[32mrender 'edit'[m
+[32m+[m		[32mend[m
+[32m+[m	[32mdef upvote[m
+[32m+[m		[32m@pin.upvote_by current_user[m
+[32m+[m		[32mredirect_to :back[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m	[32mprivate[m
+[32m+[m
+[32m+[m	[32mdef pin_params[m
+[32m+[m		[32mparams.require(:pin).permit(:title, :description, :image)[m
+[32m+[m	[32mend[m
+[32m+[m
+[32m+[m	[32mdef find_pin[m
+[32m+[m		[32m@pin = Pin.find(params[:id])[m
+[32m+[m	[32mend[m
+[1mdiff --git a/app/helpers/pins_helper.rb b/app/helpers/pins_helper.rb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0625367[m
+[1m--- /dev/null[m
+[1m+++ b/app/helpers/pins_helper.rb[m
+[36m@@ -0,0 +1,2 @@[m
+[32m+[m[32mmodule PinsHelper[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/helpers/pinsclears_helper.rb b/app/helpers/pinsclears_helper.rb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d904571[m
+[1m--- /dev/null[m
+[1m+++ b/app/helpers/pinsclears_helper.rb[m
+[36m@@ -0,0 +1,2 @@[m
+[32m+[m[32mmodule PinsclearsHelper[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/models/pin.rb b/app/models/pin.rb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..40bcb72[m
+[1m--- /dev/null[m
+[1m+++ b/app/models/pin.rb[m
+[36m@@ -0,0 +1,3 @@[m
+[32m+[m[32mclass Pin < ActiveRecord::Base[m
+[32m+[m[32m    belongs_to :user[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/models/pinsclear.rb b/app/models/pinsclear.rb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e4bd309[m
+[1m--- /dev/null[m
+[1m+++ b/app/models/pinsclear.rb[m
+[36m@@ -0,0 +1,2 @@[m
+[32m+[m[32mclass Pinsclear < ActiveRecord::Base[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/models/user.rb b/app/models/user.rb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5cb274e[m
+[1m--- /dev/null[m
+[1m+++ b/app/models/user.rb[m
+[36m@@ -0,0 +1,7 @@[m
+[32m+[m[32mclass User < ActiveRecord::Base[m
+[32m+[m[32m  # Include default devise modules. Others available are:[m
+[32m+[m[32m  # :confirmable, :lockable, :timeoutable and :omniauthable[m
+[32m+[m[32m  devise :database_authenticatable, :registerable,[m
+[32m+[m[32m         :recoverable, :rememberable, :trackable, :validatable[m
+[32m+[m[32mhas_many :pins[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/views/devise/confirmations/new.html.erb b/app/views/devise/confirmations/new.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..20d7189[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/confirmations/new.html.erb[m
+[36m@@ -0,0 +1,22 @@[m
+[32m+[m[32m<div class=”panel panel-default”>[m
+[32m+[m[32m<div class=”panel-heading”><h2>Resend confirmation instructions</h2></div>[m[41m [m
+[32m+[m[32m<div class="panel-body">[m
+[32m+[m
+[32m+[m[32m<%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>[m
+[32m+[m[32m  <%= devise_error_messages! %>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :email %><br />[m
+[32m+[m[32m    <%= f.email_field :email, autofocus: true, value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email) %>[m[41m [m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit "Resend confirmation instructions", class: 'btn btn-primary' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[32m+[m
+[32m+[m[32m<div class="panel-footer">[m
+[32m+[m
+[32m+[m[32m<%= render "devise/shared/links" %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/views/devise/mailer/confirmation_instructions.html.erb b/app/views/devise/mailer/confirmation_instructions.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..dc55f64[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/mailer/confirmation_instructions.html.erb[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32m<p>Welcome <%= @email %>!</p>[m
+[32m+[m
+[32m+[m[32m<p>You can confirm your account email through the link below:</p>[m
+[32m+[m
+[32m+[m[32m<p><%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token) %></p>[m
+[1mdiff --git a/app/views/devise/mailer/password_change.html.erb b/app/views/devise/mailer/password_change.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b41daf4[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/mailer/password_change.html.erb[m
+[36m@@ -0,0 +1,3 @@[m
+[32m+[m[32m<p>Hello <%= @resource.email %>!</p>[m
+[32m+[m
+[32m+[m[32m<p>We're contacting you to notify you that your password has been changed.</p>[m
+[1mdiff --git a/app/views/devise/mailer/reset_password_instructions.html.erb b/app/views/devise/mailer/reset_password_instructions.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f667dc1[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/mailer/reset_password_instructions.html.erb[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m<p>Hello <%= @resource.email %>!</p>[m
+[32m+[m
+[32m+[m[32m<p>Someone has requested a link to change your password. You can do this through the link below.</p>[m
+[32m+[m
+[32m+[m[32m<p><%= link_to 'Change my password', edit_password_url(@resource, reset_password_token: @token) %></p>[m
+[32m+[m
+[32m+[m[32m<p>If you didn't request this, please ignore this email.</p>[m
+[32m+[m[32m<p>Your password won't change until you access the link above and create a new one.</p>[m
+[1mdiff --git a/app/views/devise/mailer/unlock_instructions.html.erb b/app/views/devise/mailer/unlock_instructions.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..41e148b[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/mailer/unlock_instructions.html.erb[m
+[36m@@ -0,0 +1,7 @@[m
+[32m+[m[32m<p>Hello <%= @resource.email %>!</p>[m
+[32m+[m
+[32m+[m[32m<p>Your account has been locked due to an excessive number of unsuccessful sign in attempts.</p>[m
+[32m+[m
+[32m+[m[32m<p>Click the link below to unlock your account:</p>[m
+[32m+[m
+[32m+[m[32m<p><%= link_to 'Unlock my account', unlock_url(@resource, unlock_token: @token) %></p>[m
+[1mdiff --git a/app/views/devise/passwords/edit.html.erb b/app/views/devise/passwords/edit.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c0fce8a[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/passwords/edit.html.erb[m
+[36m@@ -0,0 +1,33 @@[m
+[32m+[m[32m<div class=”panel panel-default”>[m
+[32m+[m[32m<div class=”panel-heading”><h2>Change your password</h2></div>[m[41m [m
+[32m+[m[32m<div class="panel-body">[m
+[32m+[m
+[32m+[m[32m<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>[m
+[32m+[m[32m  <%= devise_error_messages! %>[m
+[32m+[m[32m  <%= f.hidden_field :reset_password_token %>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :password, "New password" %><br />[m
+[32m+[m[32m    <% if @minimum_password_length %>[m
+[32m+[m[32m      <em>(<%= @minimum_password_length %> characters minimum)</em><br />[m
+[32m+[m[32m    <% end %>[m
+[32m+[m[32m    <%= f.password_field :password, autofocus: true, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :password_confirmation, "Confirm new password" %><br />[m
+[32m+[m[32m    <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit "Change my password", class: 'btn btn-primary' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m<div class="panel-footer">[m
+[32m+[m[41m  [m
+[32m+[m[32m<%= render "devise/shared/links" %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+[32m+[m
+[32m+[m
+[1mdiff --git a/app/views/devise/passwords/new.html.erb b/app/views/devise/passwords/new.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0831195[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/passwords/new.html.erb[m
+[36m@@ -0,0 +1,28 @@[m
+[32m+[m[32m<div class=”panel panel-default”>[m
+[32m+[m[32m<div class=”panel-heading”><h2>Forgot your password?</h2></div>[m
+[32m+[m[32m<div class="panel-body">[m
+[32m+[m[41m  [m
+[32m+[m[32m<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>[m
+[32m+[m[32m  <%= devise_error_messages! %>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :email %><br />[m
+[32m+[m[32m    <%= f.email_field :email, autofocus: true, class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[41m    [m
+[32m+[m[32m    <%= f.submit "Send me reset password instructions", class: 'btn btn-primary' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m<% end %>[m
+[32m+[m
+[32m+[m[32m</div></div>[m
+[32m+[m
+[32m+[m[32m<%= render "devise/shared/links" %>[m
+[32m+[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+[32m+[m
+[32m+[m
+[32m+[m
+[1mdiff --git a/app/views/devise/registrations/edit.html.erb b/app/views/devise/registrations/edit.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c1a5f56[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/registrations/edit.html.erb[m
+[36m@@ -0,0 +1,49 @@[m
+[32m+[m[32m<div class="panel panel-primary">[m
+[32m+[m[32m  <div class="panel-heading"><h2>Edit <%= resource_name.to_s.humanize %></h2></div>[m
+[32m+[m[32m <div class="panel-body">[m
+[32m+[m[41m  [m
+[32m+[m
+[32m+[m[32m<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>[m
+[32m+[m[32m  <%= devise_error_messages! %>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :email %><br />[m
+[32m+[m[32m    <%= f.email_field :email, autofocus: true, class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>[m
+[32m+[m[32m    <div >Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>[m
+[32m+[m[32m  <% end %>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />[m
+[32m+[m[32m    <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :password_confirmation %><br />[m
+[32m+[m[32m    <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />[m
+[32m+[m[32m    <%= f.password_field :current_password, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit "Update", class: 'btn btn-primary' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[32m+[m
+[32m+[m[32m</div>[m
+[32m+[m[41m  [m
+[32m+[m[32m<h3>Cancel my account</h3>[m
+[32m+[m
+[32m+[m[32m<p>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete %></p>[m
+[32m+[m
+[32m+[m[32m<div class="panel-footer">[m
+[32m+[m[41m  [m
+[32m+[m[32m<%= link_to "Back", :back %>[m
+[32m+[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+[1mdiff --git a/app/views/devise/registrations/new.html.erb b/app/views/devise/registrations/new.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bb7eb73[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/registrations/new.html.erb[m
+[36m@@ -0,0 +1,37 @@[m
+[32m+[m[32m<div class="panel panel-primary">[m
+[32m+[m[32m  <div class="panel-heading">[m[41m [m
+[32m+[m[32m<h2>Sign up</h2></div>[m
+[32m+[m[32m<div class="panel-body"></div>[m
+[32m+[m
+[32m+[m
+[32m+[m[32m<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>[m
+[32m+[m[32m  <%= devise_error_messages! %>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :email %><br />[m
+[32m+[m[32m    <%= f.email_field :email, autofocus: true, class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :password %>[m
+[32m+[m[32m    <% if @minimum_password_length %>[m
+[32m+[m[32m    <em>(<%= @minimum_password_length %> characters minimum)</em>[m
+[32m+[m[32m    <% end %><br />[m
+[32m+[m[32m    <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :password_confirmation %><br />[m
+[32m+[m[32m    <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit "Sign up", class: 'btn btn-primary' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m<div class="panel-footer">[m
+[32m+[m
+[32m+[m[32m<%= render "devise/shared/links" %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/views/devise/sessions/new.html.erb b/app/views/devise/sessions/new.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..55bf5a1[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/sessions/new.html.erb[m
+[36m@@ -0,0 +1,32 @@[m
+[32m+[m[32m<div class="panel panel-primary">[m
+[32m+[m[32m  <div class="panel-heading"><h2>Log in</h2></div>[m
+[32m+[m[32m <div class="panel-body">[m
+[32m+[m
+[32m+[m[32m<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>[m
+[32m+[m[41m [m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :email %><br />[m
+[32m+[m[32m    <%= f.email_field :email, autofocus: true, class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="form-group">[m
+[32m+[m[32m    <%= f.label :password %><br />[m
+[32m+[m[32m    <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <% if devise_mapping.rememberable? -%>[m
+[32m+[m[32m    <div class="form-group">[m
+[32m+[m[32m      <%= f.check_box :remember_me %>[m
+[32m+[m[32m      <%= f.label :remember_me %>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  <% end -%>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit "Log in", class: 'btn btn-primary' %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m<div class="panel-footer">[m
+[32m+[m[32m<%= render "devise/shared/links" %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+[1mdiff --git a/app/views/devise/shared/_links.html.erb b/app/views/devise/shared/_links.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e6a3e41[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/shared/_links.html.erb[m
+[36m@@ -0,0 +1,25 @@[m
+[32m+[m[32m<%- if controller_name != 'sessions' %>[m
+[32m+[m[32m  <%= link_to "Log in", new_session_path(resource_name) %><br />[m
+[32m+[m[32m<% end -%>[m
+[32m+[m
+[32m+[m[32m<%- if devise_mapping.registerable? && controller_name != 'registrations' %>[m
+[32m+[m[32m  <%= link_to "Sign up", new_registration_path(resource_name) %><br />[m
+[32m+[m[32m<% end -%>[m
+[32m+[m
+[32m+[m[32m<%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>[m
+[32m+[m[32m  <%= link_to "Forgot your password?", new_password_path(resource_name) %><br />[m
+[32m+[m[32m<% end -%>[m
+[32m+[m
+[32m+[m[32m<%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>[m
+[32m+[m[32m  <%= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name) %><br />[m
+[32m+[m[32m<% end -%>[m
+[32m+[m
+[32m+[m[32m<%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>[m
+[32m+[m[32m  <%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name) %><br />[m
+[32m+[m[32m<% end -%>[m
+[32m+[m
+[32m+[m[32m<%- if devise_mapping.omniauthable? %>[m
+[32m+[m[32m  <%- resource_class.omniauth_providers.each do |provider| %>[m
+[32m+[m[32m    <%= link_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider) %><br />[m
+[32m+[m[32m  <% end -%>[m
+[32m+[m[32m<% end -%>[m
+[1mdiff --git a/app/views/devise/unlocks/new.html.erb b/app/views/devise/unlocks/new.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..16586bc[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/devise/unlocks/new.html.erb[m
+[36m@@ -0,0 +1,16 @@[m
+[32m+[m[32m<h2>Resend unlock instructions</h2>[m
+[32m+[m
+[32m+[m[32m<%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f| %>[m
+[32m+[m[32m  <%= devise_error_messages! %>[m
+[32m+[m
+[32m+[m[32m  <div class="field">[m
+[32m+[m[32m    <%= f.label :email %><br />[m
+[32m+[m[32m    <%= f.email_field :email, autofocus: true %>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit "Resend unlock instructions" %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[32m+[m
+[32m+[m[32m<%= render "devise/shared/links" %>[m
+[1mdiff --git a/app/views/home/_header.html.erb b/app/views/home/_header.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..06dbf05[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/home/_header.html.erb[m
+[36m@@ -0,0 +1,41 @@[m
+[32m+[m[32m<nav class="navbar navbar-inverse" role="navigation">" role=:navitation">[m
+[32m+[m[32m<div class="container-fluid">[m
+[32m+[m[32m<!-- Brand and toggle get grouped for better mobile display -->[m
+[32m+[m[32m<div class="navbar-header">[m
+[32m+[m[32m<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">[m
+[32m+[m[32m<span class="sr-only">Toggle navigation</span>[m[41m [m
+[32m+[m[32m<span class="icon-bar"></span>[m
+[32m+[m[32m<span class="icon-bar"></span>[m
+[32m+[m[32m￼<span class="icon-bar"></span>[m
+[32m+[m[32m</button>[m
+[32m+[m[32m<a class="navbar-brand" href="#">LillieG</a>[m
+[32m+[m[32m</div>[m
+[32m+[m
+[32m+[m[32m<!-- Collect the nav links, forms, and other content for toggling -->[m
+[32m+[m[32m<div class="collapse navbar-collapse" id="navbar-collapse">[m
+[32m+[m[41m    [m
+[32m+[m[32m<ul class="nav navbar-nav">[m
+[32m+[m[32m<li><%= link_to 'Home', root_path %></li>[m
+[32m+[m[32m<li><%= link_to 'About Me', home_about_path %></li>[m
+[32m+[m[32m<li><%= link_to 'List Pins', pins_path %></li>[m
+[32m+[m
+[32m+[m[32m<% if user_signed_in? %>[m
+[32m+[m
+[32m+[m[32m<%= javascript_include_tag :defaults %>[m
+[32m+[m
+[32m+[m[32m<li><%= link_to 'Add Pin', new_pin_path %></li>[m
+[32m+[m[32m<li><%= link_to 'Edit Profile', edit_user_registration_path %></li>[m
+[32m+[m[32m<li><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></li>[m
+[32m+[m
+[32m+[m[32m<% else %>[m
+[32m+[m
+[32m+[m[32m<li><%= link_to 'Add Pin', new_pin_path %></li>[m
+[32m+[m[32m<li><%= link_to "Login", new_user_session_path %></li>[m
+[32m+[m[32m<li><%= link_to "Join", new_user_registration_path %></li>[m
+[32m+[m
+[32m+[m[32m<% end %>[m
+[32m+[m
+[32m+[m[32m</ul>[m
+[32m+[m[32m</div><!-- /.navbar-collapse -->[m
+[32m+[m[32m</div><!-- /.container -->[m[41m [m
+[32m+[m[32m</nav>[m
+[1mdiff --git a/app/views/home/about.html.erb b/app/views/home/about.html.erb[m
+[1mindex b77f9d2..f558f95 100644[m
+[1m--- a/app/views/home/about.html.erb[m
+[1m+++ b/app/views/home/about.html.erb[m
+[36m@@ -1,2 +1,3 @@[m
+[32m+[m
+ <h1>About My App</h1>[m
+ <p>This is an excllent app</p>[m
+[1mdiff --git a/app/views/home/index.html.erb b/app/views/home/index.html.erb[m
+[1mindex c5ac921..0eb1d94 100644[m
+[1m--- a/app/views/home/index.html.erb[m
+[1m+++ b/app/views/home/index.html.erb[m
+[36m@@ -1,3 +1,8 @@[m
+[31m-<h1>Welcome To My World</h1>[m
+[31m-<p>Where our developers meets your needs</p>[m
+[31m-<p>brouse our apps for your next functional and interactive app</p>[m
+\ No newline at end of file[m
+[32m+[m[32m<div class="jumbotron">[m
+[32m+[m[32m  <h1>What You Say Na!</h1>[m
+[32m+[m[32m  <p>this is my app that's all...</p> </div>[m
+[32m+[m[41m  [m
+[32m+[m[32m<%= link_to 'About Us', home_about_path, class: 'btn btn-primary' %>[m
+[32m+[m[32m<%= link_to 'Home', root_path, class: 'btn btn-primary' %>[m
+[41m+[m
+[41m+[m
+[1mdiff --git a/app/views/layouts/application.html.erb b/app/views/layouts/application.html.erb[m
+[1mindex 2f2048b..a12cb1e 100644[m
+[1m--- a/app/views/layouts/application.html.erb[m
+[1m+++ b/app/views/layouts/application.html.erb[m
+[36m@@ -2,13 +2,23 @@[m
+ <html>[m
+ <head>[m
+   <title>LillieG</title>[m
+[31m-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>[m
+[31m-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>[m
+[32m+[m
+[32m+[m[32m <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">[m[41m [m
+[32m+[m[32m <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>[m
+   <%= csrf_meta_tags %>[m
+ </head>[m
+ <body>[m
+[32m+[m[32m<%= render 'home/header' %>[m
+[32m+[m[32m<div class="container">[m
+[32m+[m
+[32m+[m[32m<% flash.each do |name, msg| %>[m
+[32m+[m[32m<%= content_tag( :div, msg, class: "alert alert-info") %>[m
+[32m+[m[32m<% end %>[m
+[32m+[m
+[32m+[m[32m <%= yield %>[m[41m [m
+[32m+[m
+[32m+[m[32m</div>[m
+ [m
+[31m-<%= yield %>[m
+ [m
+ </body>[m
+ </html>[m
+[1mdiff --git a/app/views/pins/_form.html.erb b/app/views/pins/_form.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3decb5b[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pins/_form.html.erb[m
+[36m@@ -0,0 +1,21 @@[m
+[32m+[m[32m<%= form_for(@pin) do |f| %>[m
+[32m+[m[32m  <% if @pin.errors.any? %>[m
+[32m+[m[32m    <div id="error_explanation">[m
+[32m+[m[32m      <h2><%= pluralize(@pin.errors.count, "error") %> prohibited this pin from being saved:</h2>[m
+[32m+[m
+[32m+[m[32m      <ul>[m
+[32m+[m[32m      <% @pin.errors.full_messages.each do |message| %>[m
+[32m+[m[32m        <li><%= message %></li>[m
+[32m+[m[32m      <% end %>[m
+[32m+[m[32m      </ul>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  <% end %>[m
+[32m+[m
+[32m+[m[32m  <div class="field">[m
+[32m+[m[32m    <%= f.label :description %><br>[m
+[32m+[m[32m    <%= f.text_field :description %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[1mdiff --git a/app/views/pins/edit.html.erb b/app/views/pins/edit.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..21bc886[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pins/edit.html.erb[m
+[36m@@ -0,0 +1,6 @@[m
+[32m+[m[32m<h1>Editing Pin</h1>[m
+[32m+[m
+[32m+[m[32m<%= render 'form' %>[m
+[32m+[m
+[32m+[m[32m<%= link_to 'Show', @pin %> |[m
+[32m+[m[32m<%= link_to 'Back', pins_path %>[m
+[1mdiff --git a/app/views/pins/index.html.erb b/app/views/pins/index.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3a732f6[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pins/index.html.erb[m
+[36m@@ -0,0 +1,35 @@[m
+[32m+[m[32m<p id="notice"><%= notice %></p>[m
+[32m+[m[32m<div class="panel panel-primary">[m
+[32m+[m[32m  <div class="panel-heading"><h1>Listing Pins </h1></div>[m
+[32m+[m
+[32m+[m[32m<table>[m
+[32m+[m[32m  <thead>[m
+[32m+[m[32m    <tr>[m
+[32m+[m[32m      <th>Description</th>[m
+[32m+[m[41m        [m
+[32m+[m[32m        <table class="table table-striped">[m
+[32m+[m[32m      <th colspan="100%"></th>[m
+[32m+[m[32m    </tr>[m
+[32m+[m[32m  </thead>[m
+[32m+[m
+[32m+[m[32m  <tbody>[m
+[32m+[m[32m    <% @pins.each do |pin| %>[m
+[32m+[m[32m      <tr>[m
+[32m+[m[32m        <td><%= pin.description %></td>[m
+[32m+[m[32m        <td><%= button_to 'Show', pin, class: 'btn btn-primary' %></td>[m
+[32m+[m[32m       <% if pin.user == current_user %>[m
+[32m+[m[32m        <td><%= button_to 'Edit', edit_pin_path(pin), class: 'btn btn-info' %></td>[m
+[32m+[m[32m       <td><%= button_to 'Destroy', pin, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure?' } %></td>[m
+[32m+[m[41m    [m
+[32m+[m[32m    <% end%>[m
+[32m+[m[32m    </tr>[m
+[32m+[m[32m    <% end %>[m
+[32m+[m[32m  </tbody>[m
+[32m+[m[32m</table>[m
+[32m+[m
+[32m+[m[32m<br>[m
+[32m+[m[32m<div class="panel-footer">[m
+[32m+[m
+[32m+[m[32m<%= button_to 'New Pin', new_pin_path, class: 'btn btn-primary' %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/views/pins/index.json.jbuilder b/app/views/pins/index.json.jbuilder[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6b2c2ed[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pins/index.json.jbuilder[m
+[36m@@ -0,0 +1,4 @@[m
+[32m+[m[32mjson.array!(@pins) do |pin|[m
+[32m+[m[32m  json.extract! pin, :id, :description[m
+[32m+[m[32m  json.url pin_url(pin, format: :json)[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/views/pins/new.html.erb b/app/views/pins/new.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7469e06[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pins/new.html.erb[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m<div class="panel panel-primary">[m
+[32m+[m[32m  <div class="panel-heading"><h1>New Pin </h1></div>[m
+[32m+[m
+[32m+[m[32m<%= render 'form' %>[m
+[32m+[m
+[32m+[m[32m</br></br><%= button_to 'Back', pins_path, class: 'btn btn-primary' %>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/views/pins/show.html.erb b/app/views/pins/show.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..43aa6a1[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pins/show.html.erb[m
+[36m@@ -0,0 +1,15 @@[m
+[32m+[m[32m<p id="notice"><%= notice %></p>[m
+[32m+[m
+[32m+[m[32m<div class="panel panel-primary">[m
+[32m+[m[32m  <div class="panel-heading"><h1>Show Pin</h1></div>[m
+[32m+[m[32m<div class="panel-body">[m
+[32m+[m[41m  [m
+[32m+[m[32m</div>[m
+[32m+[m[32m<p>[m
+[32m+[m[32m  <strong>Description:</strong>[m
+[32m+[m[32m  <%= @pin.description %>[m
+[32m+[m[32m</p>[m
+[32m+[m[32m<% if pin.user == current_user %>[m
+[32m+[m[32m<%= link_to 'Edit', edit_pin_path(@pin) %> |[m
+[32m+[m[32m<% end %>[m
+[32m+[m[32m<%= link_to 'Back', pins_path %>[m
+[1mdiff --git a/app/views/pins/show.json.jbuilder b/app/views/pins/show.json.jbuilder[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8dbc02f[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pins/show.json.jbuilder[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32mjson.extract! @pin, :id, :description, :created_at, :updated_at[m
+[1mdiff --git a/app/views/pinsclears/_form.html.erb b/app/views/pinsclears/_form.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..615d4fa[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pinsclears/_form.html.erb[m
+[36m@@ -0,0 +1,17 @@[m
+[32m+[m[32m<%= form_for(@pinsclear) do |f| %>[m
+[32m+[m[32m  <% if @pinsclear.errors.any? %>[m
+[32m+[m[32m    <div id="error_explanation">[m
+[32m+[m[32m      <h2><%= pluralize(@pinsclear.errors.count, "error") %> prohibited this pinsclear from being saved:</h2>[m
+[32m+[m
+[32m+[m[32m      <ul>[m
+[32m+[m[32m      <% @pinsclear.errors.full_messages.each do |message| %>[m
+[32m+[m[32m        <li><%= message %></li>[m
+[32m+[m[32m      <% end %>[m
+[32m+[m[32m      </ul>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  <% end %>[m
+[32m+[m
+[32m+[m[32m  <div class="actions">[m
+[32m+[m[32m    <%= f.submit %>[m
+[32m+[m[32m  </div>[m
+[32m+[m[32m<% end %>[m
+[1mdiff --git a/app/views/pinsclears/edit.html.erb b/app/views/pinsclears/edit.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..79f1180[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pinsclears/edit.html.erb[m
+[36m@@ -0,0 +1,6 @@[m
+[32m+[m[32m<h1>Editing Pinsclear</h1>[m
+[32m+[m
+[32m+[m[32m<%= render 'form' %>[m
+[32m+[m
+[32m+[m[32m<%= link_to 'Show', @pinsclear %> |[m
+[32m+[m[32m<%= link_to 'Back', pinsclears_path %>[m
+[1mdiff --git a/app/views/pinsclears/index.html.erb b/app/views/pinsclears/index.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..716b052[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pinsclears/index.html.erb[m
+[36m@@ -0,0 +1,25 @@[m
+[32m+[m[32m<p id="notice"><%= notice %></p>[m
+[32m+[m
+[32m+[m[32m<h1>Listing Pinsclears</h1>[m
+[32m+[m
+[32m+[m[32m<table>[m
+[32m+[m[32m  <thead>[m
+[32m+[m[32m    <tr>[m
+[32m+[m[32m      <th colspan="3"></th>[m
+[32m+[m[32m    </tr>[m
+[32m+[m[32m  </thead>[m
+[32m+[m
+[32m+[m[32m  <tbody>[m
+[32m+[m[32m    <% @pinsclears.each do |pinsclear| %>[m
+[32m+[m[32m      <tr>[m
+[32m+[m[32m        <td><%= link_to 'Show', pinsclear %></td>[m
+[32m+[m[32m        <td><%= link_to 'Edit', edit_pinsclear_path(pinsclear) %></td>[m
+[32m+[m[32m        <td><%= link_to 'Destroy', pinsclear, method: :delete, data: { confirm: 'Are you sure?' } %></td>[m
+[32m+[m[32m      </tr>[m
+[32m+[m[32m    <% end %>[m
+[32m+[m[32m  </tbody>[m
+[32m+[m[32m</table>[m
+[32m+[m
+[32m+[m[32m<br>[m
+[32m+[m
+[32m+[m[32m<%= link_to 'New Pinsclear', new_pinsclear_path %>[m
+[1mdiff --git a/app/views/pinsclears/index.json.jbuilder b/app/views/pinsclears/index.json.jbuilder[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e3ab239[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pinsclears/index.json.jbuilder[m
+[36m@@ -0,0 +1,4 @@[m
+[32m+[m[32mjson.array!(@pinsclears) do |pinsclear|[m
+[32m+[m[32m  json.extract! pinsclear, :id[m
+[32m+[m[32m  json.url pinsclear_url(pinsclear, format: :json)[m
+[32m+[m[32mend[m
+[1mdiff --git a/app/views/pinsclears/new.html.erb b/app/views/pinsclears/new.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a8cf617[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pinsclears/new.html.erb[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32m<h1>New Pinsclear</h1>[m
+[32m+[m
+[32m+[m[32m<%= render 'form' %>[m
+[32m+[m
+[32m+[m[32m<%= link_to 'Back', pinsclears_path %>[m
+[1mdiff --git a/app/views/pinsclears/show.html.erb b/app/views/pinsclears/show.html.erb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6816b63[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pinsclears/show.html.erb[m
+[36m@@ -0,0 +1,4 @@[m
+[32m+[m[32m<p id="notice"><%= notice %></p>[m
+[32m+[m
+[32m+[m[32m<%= link_to 'Edit', edit_pinsclear_path(@pinsclear) %> |[m
+[32m+[m[32m<%= link_to 'Back', pinsclears_path %>[m
+[1mdiff --git a/app/views/pinsclears/show.json.jbuilder b/app/views/pinsclears/show.json.jbuilder[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4f35ffe[m
+[1m--- /dev/null[m
+[1m+++ b/app/views/pinsclears/show.json.jbuilder[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32mjson.extract! @pinsclear, :id, :created_at, :updated_at[m
+[1mdiff --git a/config/environments/development.rb b/config/environments

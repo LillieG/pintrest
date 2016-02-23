@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+<div class="panel panel-primary">
+  <div class="panel-heading"><h1>Listing Pins </h1></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+        
+        <table class="table table-striped">
+      <th colspan="100%"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @pins.each do |pin| %>
+      <tr>
+        <td><%= pin.description %></td>
+        <td><%= button_to 'Show', pin, class: 'btn btn-primary' %></td>
+       <% if pin.user == current_user %>
+        <td><%= button_to 'Edit', edit_pin_path(pin), class: 'btn btn-info' %></td>
+       <td><%= button_to 'Destroy', pin, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure?' } %></td>
+    
+    <% end%>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+<div class="panel-footer">
+
+<%= button_to 'New Pin', new_pin_path, class: 'btn btn-primary' %>
+</div>
+</div>

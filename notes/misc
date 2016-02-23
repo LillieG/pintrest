@@ -1,0 +1,35 @@
+<h1>New Pin</h1>
+  <tr>
+
+    <div class="form-group">
+  <label for="usr">Title:</label>
+  <input type="text" class="form-control" id="usr">
+</div></tr>
+      <th colspan="100%"></th>--)
+  
+   <tr>
+<%= render 'form' %>
+
+<%= link_to 'Back', pins_path %>
+
+.table-striped
+
+setting up Github
+
+from workspace
+git config --global user.name "lillieg"
+git config --global user.email llglasgo@gmail.com
+git config --global push.default matching
+git config --global alias.co checkout
+git init
+git add .git
+git commit -am "any comments"
+git push
+
+cat ~/.ssh/id_rsa.pub [displays the SSH Key to be added to 
+  GitHub respository - go to github create a respository and enter SSH key to link to C9.io ]
+  
+git remote add origin
+git@github.com[lillieg/respository_name].git
+git push -u origin master
+rake db:migrate
