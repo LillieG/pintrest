@@ -8,11 +8,13 @@ gem 'jquery-rails'
 gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
+gem 'spring', group: :development
+
 gem 'bootstrap-sass', '~> 3.3', '>= 3.3.6'
 gem 'devise', '~> 3.5', '>= 3.5.6'
-gem 'haml', '~> 4.0', '>= 4.0.7'
 gem 'coffee-script-source', '~> 1.10'
 gem 'paperclip', '~> 4.3', '>= 4.3.5'
+
 group :development, :test do
  gem 'sqlite3'
 end
@@ -20,6 +22,5 @@ end
 group :production do
   gem 'pg', '0.17.1' 
   gem 'rails_12factor', '0.0.2' 
-  
-  end
+end
 

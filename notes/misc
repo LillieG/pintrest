@@ -33,3 +33,34 @@ git remote add origin
 git@github.com[lillieg/respository_name].git
 git push -u origin master
 rake db:migrate
+
+
+heroku run rake db:migrate --app myapp > rake.log
+cat rake.log
+
+(set up)
+
+heroku --version
+heroku login
+heroku keys:add
+heroku create
+heroku rename (to what ever app name you want)
+
+her
+cd my-project/
+git init
+heroku git:remote -a lillieapp
+git add .
+git commit -am "make it be
+git push heroku master
+
+
+$ heroku apps:rename newname
+
+Delete app from local and heroku:
+heroku apps:destroy –app appname
+
+That’s it. …!!
+
+(if you have to remove  heroku: type the following)
+$ wget -O- https://toolbelt.heroku.com/install-ubuntu.sh 
